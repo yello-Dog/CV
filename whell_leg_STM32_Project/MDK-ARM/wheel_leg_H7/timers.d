@@ -1,0 +1,15 @@
+wheel_leg_h7\timers.o: ../Middlewares/Third_Party/FreeRTOS/Source/timers.c
+wheel_leg_h7\timers.o: C:\Users\13422\AppData\Local\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
+wheel_leg_h7\timers.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h
+wheel_leg_h7\timers.o: C:\Users\13422\AppData\Local\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+wheel_leg_h7\timers.o: C:\Users\13422\AppData\Local\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+wheel_leg_h7\timers.o: ../Core/Inc/FreeRTOSConfig.h
+wheel_leg_h7\timers.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h
+wheel_leg_h7\timers.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h
+wheel_leg_h7\timers.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h
+wheel_leg_h7\timers.o: ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F/portmacro.h
+wheel_leg_h7\timers.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h
+wheel_leg_h7\timers.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h
+wheel_leg_h7\timers.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h
+wheel_leg_h7\timers.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h
+wheel_leg_h7\timers.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h

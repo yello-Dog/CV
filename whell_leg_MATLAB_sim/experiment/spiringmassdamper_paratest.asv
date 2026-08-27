@@ -1,0 +1,183 @@
+
+%% ===== 基本设置 =====
+model = 'wheel_leg';
+
+% 扫 KP_leg
+KP_list = [300 500 700 900 1100 1300 1500 1700 2000];
+
+% 扫阻尼比
+zeta_list = 0.3:0.1:0.9;
+
+% 固定 N_filter
+N_filter = 300;
+
+% 单条腿前馈力
+F_ff = 9.0;
+
+% 单条腿等效质量
+m_eff = F_ff / 9.81;
+
+StopTime = '10';
+
+if ~bdIsLoaded(model)
+    load_system(model);
+end
+
+set_param(model, 'StopTime', StopTime);
+
+try
+    set_param(model, 'SimscapeLogType', 'none');
+catch
+end
+
+%% ===== 自动仿真 =====
+results = struct();
+idx = 0;
+
+for zi = 1:length(zeta_list)
+
+    zeta = zeta_list(zi);
+
+    for ki = 1:length(KP_list)
+
+        KP_leg = KP_list(ki);
+
+        % 根据阻尼比自动计算 KD_leg
+        KD_leg = 2 * zeta * sqrt(KP_leg * m_eff);
+
+        idx = idx + 1;
+
+        fprintf('\nRunning zeta = %.1f, KP_leg = %.1f, KD_leg = %.2f, N_filter = %.0f\n', ...
+            zeta, KP_leg, KD_leg, N_filter);
+
+        simIn = Simulink.SimulationInput(model);
+
+        simIn = simIn.setVariable('KP_leg', KP_leg);
+        simIn = simIn.setVariable('KD_leg', KD_leg);
+        simIn = simIn.setVariable('N_filter', N_filter);
+        simIn = simIn.setVariable('F_ff', F_ff);
+        simIn = simIn.setModelParameter('StopTime', StopTime);
+
+        results(idx).zeta = zeta;
+        results(idx).KP_leg = KP_leg;
+        results(idx).KD_leg = KD_leg;
+        results(idx).N_filter = N_filter;
+        results(idx).ok = false;
+        results(idx).error_msg = "";
+
+        try
+            % 捕获 Simscape 警告，不在命令行刷屏
+            sim_msg = evalc('out = sim(simIn);');
+
+            results(idx).ok = true;
+            results(idx).sim_msg = sim_msg;
+
+            results(idx).L0  = get_ts(out, 'L0');
+            results(idx).dxd = get_ts(out, 'dxd');
+            results(idx).xd  = get_ts(out, 'xd');
+            results(idx).dx  = get_ts(out, 'dx');
+            results(idx).x   = get_ts(out, 'x');
+
+        catch ME
+            results(idx).ok = false;
+            results(idx).error_msg = ME.message;
+
+            fprintf('!!! 仿真失败：zeta = %.1f, KP_leg = %.1f, KD_leg = %.2f\n', ...
+                zeta, KP_leg, KD_leg);
+            fprintf('原因：%s\n', ME.message);
+
+            continue;
+        end
+
+    end
+end
+
+save('KP_zeta_sweep_results.mat', ...
+    'results', 'KP_list', 'zeta_list', 'N_filter', 'F_ff', 'm_eff');
+
+%% ===== 每组实验一个窗口 =====
+for i = 1:length(results)
+
+    if ~results(i).ok
+        continue;
+    end
+
+    zeta = results(i).zeta;
+    KP_leg = results(i).KP_leg;
+    KD_leg = results(i).KD_leg;
+
+    ts_L0  = results(i).L0;
+    ts_dxd = results(i).dxd;
+    ts_xd  = results(i).xd;
+    ts_dx  = results(i).dx;
+    ts_x   = results(i).x;
+
+    figure('Name', sprintf('zeta=%.1f, KP=%.0f, KD=%.1f', zeta, KP_leg, KD_leg), ...
+           'Color', 'w');
+
+    tiledlayout(3, 1, ...
+        'TileSpacing', 'compact', ...
+        'Padding', 'compact');
+
+    %% 1. L0
+    nexttile;
+    plot(ts_L0.Time, squeeze(ts_L0.Data), 'LineWidth', 1.2);
+    grid on;
+    xlabel('Time (s)');
+    ylabel('L0 (m)');
+    title('Leg length L0');
+
+    %% 2. dxd 和 xd
+    nexttile;
+    yyaxis left;
+    plot(ts_dxd.Time, squeeze(ts_dxd.Data), 'LineWidth', 1.2);
+    ylabel('dxd (m/s)');
+
+    yyaxis right;
+    plot(ts_xd.Time, squeeze(ts_xd.Data), 'LineWidth', 1.2);
+    ylabel('xd (m)');
+
+    grid on;
+    xlabel('Time (s)');
+    title('Target velocity dxd and target position xd');
+    legend('dxd','xd','Location','best');
+
+    %% 3. dx 和 x
+    nexttile;
+    yyaxis left;
+    plot(ts_dx.Time, squeeze(ts_dx.Data), 'LineWidth', 1.2);
+    ylabel('dx (m/s)');
+
+    yyaxis right;
+    plot(ts_x.Time, squeeze(ts_x.Data), 'LineWidth', 1.2);
+    ylabel('x (m)');
+
+    grid on;
+    xlabel('Time (s)');
+    title('Actual velocity dx and actual position x');
+    legend('dx','x','Location','best');
+
+    sgtitle(sprintf('zeta = %.1f, KP\\_leg = %.0f, KD\\_leg = %.2f, N\\_filter = %.0f', ...
+        zeta, KP_leg, KD_leg, N_filter));
+
+end
+
+%% ===== 读取 timeseries =====
+function ts = get_ts(out, name)
+
+    try
+        ts = out.(name);
+        return;
+    catch
+    end
+
+    try
+        sig = out.logsout.get(name);
+        ts = sig.Values;
+        return;
+    catch
+    end
+
+    error('找不到信号 "%s"，检查 To Workspace 变量名。', name);
+
+end

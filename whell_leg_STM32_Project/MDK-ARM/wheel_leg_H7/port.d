@@ -1,0 +1,12 @@
+wheel_leg_h7\port.o: ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F/port.c
+wheel_leg_h7\port.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h
+wheel_leg_h7\port.o: C:\Users\13422\AppData\Local\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+wheel_leg_h7\port.o: C:\Users\13422\AppData\Local\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+wheel_leg_h7\port.o: ../Core/Inc/FreeRTOSConfig.h
+wheel_leg_h7\port.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h
+wheel_leg_h7\port.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h
+wheel_leg_h7\port.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h
+wheel_leg_h7\port.o: ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F/portmacro.h
+wheel_leg_h7\port.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h
+wheel_leg_h7\port.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h
+wheel_leg_h7\port.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h
